@@ -1,4 +1,5 @@
 import os
+import csv
 
 from flask import Flask, session
 from flask_session import Session
@@ -20,7 +21,16 @@ Session(app)
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 
-
-@app.route("/")
+@app.route("/", methods=["POST"])
 def index():
     return "Project 1: TODO"
+
+def main():
+    f = open("books.csv")
+    reader = csv.reader(f)
+    for origin, destination, duration in reader:
+        db.execute("INSERT INTO books (isbn, title, author, year)")
+    db.commit()
+
+if __name__ == "main":
+    main()
