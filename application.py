@@ -1,7 +1,7 @@
 import os
 import csv
 
-from flask import Flask, session
+from flask import Flask, session, render_template
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -21,16 +21,22 @@ Session(app)
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 
-@app.route("/", methods=["POST"])
+@app.route("/")
 def index():
-    return "Project 1: TODO"
+    headline = "Hello, world!"
+    return render_template("index.html", headline=headline)
+
+@app.route("/<string:name>")
+def hell(name):
+    return f"<h1>Hello, {name}!</h1>"
+
+@app.route("/bye")
+def bye():
+    headline = "Goodbye!"
+    return render_template("index.html", headline=headline)
 
 def main():
     f = open("books.csv")
-    reader = csv.reader(f)
-    for origin, destination, duration in reader:
-        db.execute("INSERT INTO books (isbn, title, author, year)")
-    db.commit()
-
+    
 if __name__ == "main":
     main()
