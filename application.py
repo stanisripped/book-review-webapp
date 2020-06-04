@@ -21,10 +21,18 @@ Session(app)
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 
-@app.route("/")
-def index():
-    headline = "Hello, world!"
-    return render_template("index.html", headline=headline)
+
+# login
+username = []
+password = []
+
+@app.route("/", methods=["GET", "POST"])
+def login():
+    if session.get("username") is None:
+        session["username"] = []
+    if request.method == "POST":
+        headline = "Hello, world!"
+        return render_template("index.html", headline=headline)
 
 @app.route("/<string:name>")
 def hell(name):
@@ -37,6 +45,11 @@ def bye():
 
 def main():
     f = open("books.csv")
-    
+    reader = csv.reader(f)
+    for isbn, title, author, year in reader:
+        db.execute("INSERT INTO books (isbn, title, author, year) VALUES (:isbn, :title, :author, :year)",
+                {"isbn": isbn, "title": title, "author": author, "year": year})
+        print(f"Added {title} by {author} written in {year} with isbn: {isbn}")
+    db.commit()
 if __name__ == "main":
     main()
